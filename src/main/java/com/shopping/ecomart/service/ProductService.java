@@ -19,7 +19,7 @@ public class ProductService {
     @Autowired
     ProductRepository productRepo;
     public List<Product> getAllProducts(){
-        log.info("Returning all products");
+        log.info("Returning all Products");
         List<Product> productList = new ArrayList<>();
         Iterable<Product> allProducts = productRepo.findAll();
         allProducts.forEach(product -> productList.add(product));
