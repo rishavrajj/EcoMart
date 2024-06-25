@@ -3,6 +3,8 @@ package com.shopping.ecomart.service;
 import com.shopping.ecomart.dtos.ProductDTO;
 import com.shopping.ecomart.dtos.ResultResponseDTO;
 import com.shopping.ecomart.entity.Product;
+import com.shopping.ecomart.exception.ResourceAlreadyExistException;
+import com.shopping.ecomart.exception.ResourceNotFoundException;
 import com.shopping.ecomart.repository.ProductRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,14 +33,14 @@ public class ProductService {
     public ResultResponseDTO getProductById(int productId){
         log.info("returning product for Product Id: "+productId);
         Optional<Product> optionalProduct = productRepo.findById(productId);
-       return new ResultResponseDTO("DATA FOUND", optionalProduct.orElse(null));
+       return new ResultResponseDTO("DATA FOUND", optionalProduct.orElseThrow(() -> new ResourceNotFoundException("Product", "productId", productId)));
     }
     public ResultResponseDTO updateProduct(ProductDTO productDTO){
         Product productEntity = new Product();
         BeanUtils.copyProperties(productDTO,productEntity);
-        int productId = productDTO.getProductId();
+        int productId = productDTO.getId();
         Optional<Product> optionalProduct = productRepo.findById(productId);
-        Product productEntityNew = optionalProduct.orElse(null);
+        Product productEntityNew = optionalProduct.orElseThrow(() -> new ResourceNotFoundException("Product", "productId", productId));
         if (productEntityNew == null) {
             return new ResultResponseDTO("INVALID INPUT DATA  ", null);
         }
@@ -49,9 +51,11 @@ public class ProductService {
     }
 
     public ResultResponseDTO addProduct(Product product){
+        List<Product> pr = productRepo.findByProductName(product.getProductName());
+        if(pr.size()!=0){
+            throw new ResourceAlreadyExistException("Product","ProductName", product.getProductName());
+        }
         Product savedProduct = productRepo.save(product);
         return new ResultResponseDTO("CREATED", savedProduct);
-
-
     }
 }

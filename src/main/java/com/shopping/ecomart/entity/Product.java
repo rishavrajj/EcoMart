@@ -1,5 +1,6 @@
 package com.shopping.ecomart.entity;
 
+import com.fasterxml.jackson.databind.ser.Serializers;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -13,18 +14,11 @@ import java.time.LocalDateTime;
 
 @Entity
 @Data
-public class Product {
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private int productId;
+public class Product extends BaseEntity {
     private String productName;
     private int price;
     private String productDesc;
     private int quantity;
     private String category;
-    @CreationTimestamp
-    private LocalDateTime createdTime;
-    @UpdateTimestamp
-    private LocalDateTime updatedTime;
 
 }
