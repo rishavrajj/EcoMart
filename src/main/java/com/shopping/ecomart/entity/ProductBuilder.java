@@ -73,14 +73,14 @@ public class ProductBuilder {
 
         public Product build(){
             Product product = new Product();
-            product.setProductId(productId);
+//            product.setProductId(productId);
             product.setProductName(productName);
             product.setPrice(price);
             product.setProductDesc(productDesc);
             product.setQuantity(quantity);
             product.setCategory(category);
-            product.setCreatedTime(createdTime);
-            product.setUpdatedTime(updatedTime);
+//            product.setCreatedTime(createdTime);
+//            product.setUpdatedTime(updatedTime);
             return product;
         }
 

@@ -1,6 +1,7 @@
 package com.shopping.ecomart.service;
 
 import com.shopping.ecomart.dtos.ProductDTO;
+import com.shopping.ecomart.dtos.ResultResponseDTO;
 import com.shopping.ecomart.entity.Product;
 import com.shopping.ecomart.repository.ProductRepository;
 import org.slf4j.Logger;
@@ -20,36 +21,36 @@ public class ProductService {
 
     @Autowired
     ProductRepository productRepo;
-    public Response<List<Product>> getAllProducts(){
+    public ResultResponseDTO getAllProducts(){
         log.info("Returning all Products");
         List<Product> productList = new ArrayList<>();
         Iterable<Product> allProducts = productRepo.findAll();
         allProducts.forEach(productList::add);
-        return new Response<List<Product>>("DATA FOUND",productList);
+        return new ResultResponseDTO("DATA FOUND",productList);
     }
-    public Response<Product> getProductById(int productId){
+    public ResultResponseDTO getProductById(int productId){
         log.info("returning product for Product Id: "+productId);
         Optional<Product> optionalProduct = productRepo.findById(productId);
-       return new Response<>("DATA FOUND", optionalProduct.orElse(null));
+       return new ResultResponseDTO("DATA FOUND", optionalProduct.orElse(null));
     }
-    public Response<ProductDTO> updateProduct(ProductDTO productDTO){
+    public ResultResponseDTO updateProduct(ProductDTO productDTO){
         Product productEntity = new Product();
         BeanUtils.copyProperties(productDTO,productEntity);
         int productId = productDTO.getProductId();
         Optional<Product> optionalProduct = productRepo.findById(productId);
         Product productEntityNew = optionalProduct.orElse(null);
         if (productEntityNew == null) {
-            return new Response<>("INVALID INPUT DATA  ", null);
+            return new ResultResponseDTO("INVALID INPUT DATA  ", null);
         }
         log.info("updating product for Product Id: "+productId);
         productEntity = productRepo.save(productEntity);
         BeanUtils.copyProperties(productEntity,productDTO);
-        return new Response<>("DATA UPDATED",productDTO);
+        return new ResultResponseDTO("DATA UPDATED",productDTO);
     }
 
-    public Response<Product> addProduct(Product product){
+    public ResultResponseDTO addProduct(Product product){
         Product savedProduct = productRepo.save(product);
-        return new Response<>("CREATED", savedProduct);
+        return new ResultResponseDTO("CREATED", savedProduct);
 
 
     }
