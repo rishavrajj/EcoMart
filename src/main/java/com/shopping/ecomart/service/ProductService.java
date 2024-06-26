@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.ResourceBundle;
 
 @Service
 public class ProductService {
@@ -23,17 +24,27 @@ public class ProductService {
 
     @Autowired
     ProductRepository productRepo;
+
     public ResultResponseDTO getAllProducts(){
         log.info("Returning all Products");
-        List<Product> productList = new ArrayList<>();
+        List<ProductDTO> productList = new ArrayList<>();
         Iterable<Product> allProducts = productRepo.findAll();
-        allProducts.forEach(productList::add);
+        if(!allProducts.iterator().hasNext()){
+            new ResourceNotFoundException("Product");
+        }
+        allProducts.forEach(product -> {
+            ProductDTO productDTO = new ProductDTO();
+            BeanUtils.copyProperties(product,productDTO);
+            productList.add(productDTO);
+        });
         return new ResultResponseDTO("DATA FOUND",productList);
     }
     public ResultResponseDTO getProductById(int productId){
         log.info("returning product for Product Id: "+productId);
         Optional<Product> optionalProduct = productRepo.findById(productId);
-       return new ResultResponseDTO("DATA FOUND", optionalProduct.orElseThrow(() -> new ResourceNotFoundException("Product", "productId", productId)));
+        ProductDTO productDTO = new ProductDTO();
+        BeanUtils.copyProperties(optionalProduct.orElseThrow(() -> new ResourceNotFoundException("Product", "productId", productId)),productDTO);
+       return new ResultResponseDTO("DATA FOUND", productDTO);
     }
     public ResultResponseDTO updateProduct(ProductDTO productDTO){
         Product productEntity = new Product();
@@ -41,9 +52,6 @@ public class ProductService {
         int productId = productDTO.getId();
         Optional<Product> optionalProduct = productRepo.findById(productId);
         Product productEntityNew = optionalProduct.orElseThrow(() -> new ResourceNotFoundException("Product", "productId", productId));
-        if (productEntityNew == null) {
-            return new ResultResponseDTO("INVALID INPUT DATA  ", null);
-        }
         log.info("updating product for Product Id: "+productId);
         productEntity = productRepo.save(productEntity);
         BeanUtils.copyProperties(productEntity,productDTO);
@@ -56,6 +64,16 @@ public class ProductService {
             throw new ResourceAlreadyExistException("Product","ProductName", product.getProductName());
         }
         Product savedProduct = productRepo.save(product);
-        return new ResultResponseDTO("CREATED", savedProduct);
+        ProductDTO productDTO = new ProductDTO();
+        BeanUtils.copyProperties(savedProduct,productDTO);
+        return new ResultResponseDTO("CREATED", productDTO);
+    }
+
+    public ResultResponseDTO deleteProduct(int productId){
+        Optional<Product> optionalProduct = productRepo.findById(productId);
+        Product productEntity = optionalProduct.orElseThrow(() -> new ResourceNotFoundException("Product", "productId", productId));
+        log.info("Deleting Product for Product Id: "+productId);
+        productRepo.delete(productEntity);
+        return new ResultResponseDTO("DATA DELETED", "Product deleted for Product Id:"+productId );
     }
 }
