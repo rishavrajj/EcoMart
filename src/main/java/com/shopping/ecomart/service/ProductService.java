@@ -11,11 +11,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.ResourceBundle;
+
+import static com.shopping.ecomart.util.ApplicationConstant.StatusCode;
 
 @Service
 public class ProductService {
@@ -25,55 +25,58 @@ public class ProductService {
     @Autowired
     ProductRepository productRepo;
 
-    public ResultResponseDTO getAllProducts(){
+    public ResultResponseDTO getAllProducts() {
         log.info("Returning all Products");
         List<ProductDTO> productList = new ArrayList<>();
         Iterable<Product> allProducts = productRepo.findAll();
-        if(!allProducts.iterator().hasNext()){
-            new ResourceNotFoundException("Product");
+        if (!allProducts.iterator().hasNext()) {
+            return ResultResponseDTO.builder().message(StatusCode.DATA_NOT_FOUND).response(productList).build();
         }
         allProducts.forEach(product -> {
             ProductDTO productDTO = new ProductDTO();
-            BeanUtils.copyProperties(product,productDTO);
+            BeanUtils.copyProperties(product, productDTO);
             productList.add(productDTO);
         });
-        return new ResultResponseDTO("DATA FOUND",productList);
-    }
-    public ResultResponseDTO getProductById(int productId){
-        log.info("returning product for Product Id: "+productId);
-        Optional<Product> optionalProduct = productRepo.findById(productId);
-        ProductDTO productDTO = new ProductDTO();
-        BeanUtils.copyProperties(optionalProduct.orElseThrow(() -> new ResourceNotFoundException("Product", "productId", productId)),productDTO);
-       return new ResultResponseDTO("DATA FOUND", productDTO);
-    }
-    public ResultResponseDTO updateProduct(ProductDTO productDTO){
-        Product productEntity = new Product();
-        BeanUtils.copyProperties(productDTO,productEntity);
-        int productId = productDTO.getId();
-        Optional<Product> optionalProduct = productRepo.findById(productId);
-        Product productEntityNew = optionalProduct.orElseThrow(() -> new ResourceNotFoundException("Product", "productId", productId));
-        log.info("updating product for Product Id: "+productId);
-        productEntity = productRepo.save(productEntity);
-        BeanUtils.copyProperties(productEntity,productDTO);
-        return new ResultResponseDTO("DATA UPDATED",productDTO);
+        return ResultResponseDTO.builder().message(StatusCode.DATA_FOUND).response(productList).build();
     }
 
-    public ResultResponseDTO addProduct(Product product){
+    public ResultResponseDTO getProductById(int productId) {
+        log.info("Returning product for Product Id: " + productId);
+        Optional<Product> optionalProduct = productRepo.findById(productId);
+        ProductDTO productDTO = new ProductDTO();
+        BeanUtils.copyProperties(optionalProduct.orElseThrow(() -> new ResourceNotFoundException("Product", "productId", productId)), productDTO);
+        return ResultResponseDTO.builder().message(StatusCode.DATA_FOUND).response(productDTO).build();
+    }
+
+    public ResultResponseDTO updateProduct(ProductDTO productDTO) {
+        Product productEntity = new Product();
+        BeanUtils.copyProperties(productDTO, productEntity);
+        int productId = productDTO.getId();
+        Optional<Product> optionalProduct = productRepo.findById(productId);
+        optionalProduct.orElseThrow(() -> new ResourceNotFoundException("Product", "productId", productId));
+        log.info("Updating product for Product Id: " + productId);
+        productEntity = productRepo.save(productEntity);
+        BeanUtils.copyProperties(productEntity, productDTO);
+        return ResultResponseDTO.builder().message(StatusCode.RESOURCE_UPDATED).response(productDTO).build();
+    }
+
+    public ResultResponseDTO addProduct(Product product) {
         List<Product> pr = productRepo.findByProductName(product.getProductName());
-        if(pr.size()!=0){
-            throw new ResourceAlreadyExistException("Product","ProductName", product.getProductName());
+        if (!pr.isEmpty()) {
+            throw new ResourceAlreadyExistException("Product", "ProductName", product.getProductName());
         }
         Product savedProduct = productRepo.save(product);
         ProductDTO productDTO = new ProductDTO();
-        BeanUtils.copyProperties(savedProduct,productDTO);
-        return new ResultResponseDTO("CREATED", productDTO);
+        BeanUtils.copyProperties(savedProduct, productDTO);
+        return ResultResponseDTO.builder().message(StatusCode.RESOURCE_CREATED).response(productDTO).build();
     }
 
-    public ResultResponseDTO deleteProduct(int productId){
+    public ResultResponseDTO deleteProduct(int productId) {
         Optional<Product> optionalProduct = productRepo.findById(productId);
         Product productEntity = optionalProduct.orElseThrow(() -> new ResourceNotFoundException("Product", "productId", productId));
-        log.info("Deleting Product for Product Id: "+productId);
+        log.info("Deleting Product for Product Id: " + productId);
         productRepo.delete(productEntity);
-        return new ResultResponseDTO("DATA DELETED", "Product deleted for Product Id:"+productId );
+        return ResultResponseDTO.builder().message(StatusCode.RESOURCE_DELETED).response("Product deleted for Product Id:" + productId)
+                .response(null).build();
     }
 }
