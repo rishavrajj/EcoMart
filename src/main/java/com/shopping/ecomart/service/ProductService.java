@@ -49,13 +49,12 @@ public class ProductService {
     }
 
     public ResultResponseDTO updateProduct(ProductDTO productDTO) {
-        Product productEntity = new Product();
-        BeanUtils.copyProperties(productDTO, productEntity);
         int productId = productDTO.getId();
         Optional<Product> optionalProduct = productRepo.findById(productId);
-        optionalProduct.orElseThrow(() -> new ResourceNotFoundException("Product", "productId", productId));
+        Product product = optionalProduct.orElseThrow(() -> new ResourceNotFoundException("Product", "productId", productId));
+        BeanUtils.copyProperties(productDTO,product);
         log.info("Updating product for Product Id: " + productId);
-        productEntity = productRepo.save(productEntity);
+        Product productEntity = productRepo.save(product);
         BeanUtils.copyProperties(productEntity, productDTO);
         return ResultResponseDTO.builder().message(StatusCode.RESOURCE_UPDATED).response(productDTO).build();
     }
