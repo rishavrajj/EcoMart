@@ -6,6 +6,7 @@ public class ApplicationConstant {
         DATA_NOT_FOUND,
         RESOURCE_CREATED,
         RESOURCE_UPDATED,
-        RESOURCE_DELETED;
+        RESOURCE_DELETED,
+        UPDATE_FAILED;
     }
 }
