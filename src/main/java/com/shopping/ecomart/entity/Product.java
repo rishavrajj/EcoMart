@@ -1,22 +1,17 @@
 package com.shopping.ecomart.entity;
 
-import com.fasterxml.jackson.databind.ser.Serializers;
-import jakarta.persistence.*;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.OneToMany;
 import lombok.Data;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
 @Data
-public class Product {
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private int id;
+public class Product extends BaseEntity{
     private String productName;
     private int price;
     private String productDesc;

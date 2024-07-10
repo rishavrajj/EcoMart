@@ -1,6 +1,8 @@
 package com.shopping.ecomart.entity;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -13,11 +15,7 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Address {
-
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long addressId;
+public class Address extends BaseEntity {
 
 	private String street;
 	
@@ -32,7 +30,7 @@ public class Address {
 	private String pincode;
 
 	@ManyToMany(mappedBy = "addresses")
-	private List<User> users = new ArrayList<>();
+	private List<MyUser> myUsers = new ArrayList<>();
 
 	public Address(String country, String state, String city, String pincode, String street, String buildingName) {
 		this.country = country;

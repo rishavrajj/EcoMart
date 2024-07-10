@@ -10,7 +10,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Configurable;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -24,7 +27,7 @@ public class ProductService {
 
     @Autowired
     ProductRepository productRepo;
-
+    @PreAuthorize("hasRole('user')")
     public ResultResponseDTO getAllProducts() {
         log.info("Returning all Products");
         List<ProductDTO> productList = new ArrayList<>();
@@ -58,7 +61,7 @@ public class ProductService {
         BeanUtils.copyProperties(productEntity, productDTO);
         return ResultResponseDTO.builder().message(StatusCode.RESOURCE_UPDATED).response(productDTO).build();
     }
-
+    @PreAuthorize("hasAnyRole('admin','user')")
     public ResultResponseDTO addProduct(Product product) {
         List<Product> pr = productRepo.findByProductName(product.getProductName());
         if (!pr.isEmpty()) {

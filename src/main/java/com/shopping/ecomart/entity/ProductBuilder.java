@@ -1,8 +1,5 @@
 package com.shopping.ecomart.entity;
 
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
-
 import java.time.LocalDateTime;
 
 public class ProductBuilder {
