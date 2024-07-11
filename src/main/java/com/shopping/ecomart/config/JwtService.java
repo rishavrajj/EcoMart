@@ -1,39 +1,42 @@
-package com.shopping.ecomart.service;
+package com.shopping.ecomart.config;
 
+import com.shopping.ecomart.entity.MyUser;
+import com.shopping.ecomart.entity.Role;
+import com.shopping.ecomart.util.ApplicationConstant;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
 import java.time.Instant;
-import java.util.Base64;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 @Service
 public class JwtService {
 
-    private static final String SECRET = "638CBE3A90E0303BF3808F40F95A7F02A24B4B5D029C954CF553F79E9EF1DC0384BE681C249F1223F6B55AA21DC070914834CA22C8DD98E14A872CA010091ACC";
-    private static final long VALIDITY = TimeUnit.MINUTES.toMillis(30);
+    //private static final String SECRET = "638CBE3A90E0303BF3808F40F95A7F02A24B4B5D029C954CF553F79E9EF1DC0384BE681C249F1223F6B55AA21DC070914834CA22C8DD98E14A872CA010091ACC";
+   // private static final long VALIDITY = TimeUnit.MINUTES.toMillis(ApplicationConstant.JWT_TOKEN_EXPIRY_TIME);
 
-    public String generateToken(UserDetails userDetails) {
+    public String generateToken(MyUser user) {
+        UserDetails userDetails=getUserDetails(user);
         Map<String, String> claims = new HashMap<>();
-        //claims.put("iss", "https://secure.genuinecoder.com");
         return Jwts.builder()
                 .setClaims(claims)
                 .setSubject(userDetails.getUsername())
                 .setIssuedAt(Date.from(Instant.now()))
-                .setExpiration(Date.from(Instant.now().plusMillis(VALIDITY)))
+                .setExpiration(Date.from(Instant.now().plusMillis(ApplicationConstant.JWT_VALIDITY)))
                 .signWith(generateKey())
                 .compact();
     }
 
     private SecretKey generateKey() {
-        byte[] decodedKey = Base64.getDecoder().decode(SECRET);
+        byte[] decodedKey = Base64.getDecoder().decode(ApplicationConstant.JWT_KEY);
         return Keys.hmacShaKeyFor(decodedKey);
     }
 
@@ -46,7 +49,7 @@ public class JwtService {
         Claims claims;
         try {
             claims = Jwts.parser()
-                    .setSigningKey(SECRET)
+                    .setSigningKey(ApplicationConstant.JWT_KEY)
                     .parseClaimsJws(jwt)
                     .getBody();
         } catch (Exception e) {
@@ -66,6 +69,15 @@ public class JwtService {
     public boolean isTokenValid(String jwt,String username) {
         String jwtUsername = extractUsername(jwt);
         return username.equals(jwtUsername) && !isTokenExpired(jwt);
+    }
+    private UserDetails getUserDetails(MyUser user) {
+        Optional<Role> first = user.getRoles().stream().findFirst();
+        List<GrantedAuthority> authority=new ArrayList<>();
+        first.ifPresent(role -> {
+            SimpleGrantedAuthority simpleGrantedAuthority = new SimpleGrantedAuthority(role.getRoleName());
+            authority.add(simpleGrantedAuthority);
+        });
+        return new User(user.getUserName(), user.getPassword(),authority);
     }
 
 }

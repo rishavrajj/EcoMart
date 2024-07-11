@@ -1,7 +1,8 @@
 package com.shopping.ecomart.controller;
 
-import com.shopping.ecomart.entity.MyUser;
-import com.shopping.ecomart.repository.MyUserRepository;
+import com.shopping.ecomart.dtos.ResultResponseDTO;
+import com.shopping.ecomart.dtos.UserRegsReqDTO;
+import com.shopping.ecomart.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -12,13 +13,13 @@ import org.springframework.web.bind.annotation.RestController;
 public class RegistrationController {
 
     @Autowired
-    private MyUserRepository myUserRepository;
+    private UserService userService;
     @Autowired
     private PasswordEncoder passwordEncoder;
 
     @PostMapping("/register/user")
-    public MyUser createUser(@RequestBody MyUser user) {
+    public ResultResponseDTO createUser(@RequestBody UserRegsReqDTO user) {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
-        return myUserRepository.save(user);
+        return userService.save(user);
     }
 }

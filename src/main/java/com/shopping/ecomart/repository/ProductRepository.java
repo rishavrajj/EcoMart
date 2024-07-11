@@ -7,5 +7,5 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 @Repository
 public interface ProductRepository extends JpaRepository<Product, Integer> {
-    public List<Product> findByProductName(String productName);
+    List<Product> findByProductName(String productName);
 }
