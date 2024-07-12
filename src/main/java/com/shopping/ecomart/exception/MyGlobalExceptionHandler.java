@@ -51,9 +51,7 @@ public class MyGlobalExceptionHandler {
 
     @ExceptionHandler(AuthenticationException.class)
     public ResponseEntity<String> myAuthenticationException(AuthenticationException e) {
-
         String res = e.getMessage();
-
         return new ResponseEntity<String>(res, HttpStatus.BAD_REQUEST);
     }
 
@@ -64,6 +62,10 @@ public class MyGlobalExceptionHandler {
 
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ResultResponseDTO myDataIntegrityException(DataIntegrityViolationException e) {
+        return ResultResponseDTO.builder().message(HttpStatus.BAD_REQUEST).description(e.getMessage()).build();
+    }
+    @ExceptionHandler(RoleNotFoundException.class)
+    public ResultResponseDTO myRoleNotFoundException(RoleNotFoundException e) {
         return ResultResponseDTO.builder().message(HttpStatus.BAD_REQUEST).description(e.getMessage()).build();
     }
 }

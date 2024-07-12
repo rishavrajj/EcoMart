@@ -1,6 +1,5 @@
 package com.shopping.ecomart.dtos;
 
-import com.shopping.ecomart.entity.Role;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
