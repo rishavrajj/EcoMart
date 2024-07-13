@@ -13,15 +13,12 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
+import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.*;
-import java.util.concurrent.TimeUnit;
 
 @Service
 public class JwtService {
-
-    //private static final String SECRET = "638CBE3A90E0303BF3808F40F95A7F02A24B4B5D029C954CF553F79E9EF1DC0384BE681C249F1223F6B55AA21DC070914834CA22C8DD98E14A872CA010091ACC";
-   // private static final long VALIDITY = TimeUnit.MINUTES.toMillis(ApplicationConstant.JWT_TOKEN_EXPIRY_TIME);
 
     public String generateToken(MyUser user) {
         UserDetails userDetails=getUserDetails(user);
@@ -48,8 +45,9 @@ public class JwtService {
     private Claims getClaims(String jwt) {
         Claims claims;
         try {
-            claims = Jwts.parser()
-                    .setSigningKey(ApplicationConstant.JWT_KEY)
+            claims = Jwts.parserBuilder()
+                    .setSigningKey(generateKey())
+                    .build()
                     .parseClaimsJws(jwt)
                     .getBody();
         } catch (Exception e) {

@@ -12,9 +12,9 @@ import lombok.NoArgsConstructor;
 @Builder
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class ResultResponseDTO<M, R> {
-
     private M message;
-    private R response;
+    private int key;
+    private R data;
     private String description;
 
 }

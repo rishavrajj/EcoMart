@@ -33,7 +33,7 @@ public class UserService {
         UserRegsRespDTO userRegsRespDTO = UserRegsRespDTO.builder().roles(rolesRes).build();
         BeanUtils.copyProperties(savedUser, userRegsRespDTO);
         return ResultResponseDTO.builder().message(ApplicationConstant.StatusCode.RESOURCE_CREATED)
-                .response(userRegsRespDTO).build();
+                .data(userRegsRespDTO).build();
     }
 
     private static Set<String> setRolesAsString(MyUser savedUser) {

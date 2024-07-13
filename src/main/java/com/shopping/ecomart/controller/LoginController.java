@@ -34,10 +34,10 @@ public class LoginController {
             String dbUserName = dbUser.getUserName();
             if (userName.equals(dbUserName) && passwordEncoder.matches(user.getPassword(), dbPassword)) {
                 String jwt = jwtService.generateToken(dbUser);
-                return ResultResponseDTO.builder().message("JWT Token Generated!").response(jwt).build();
+                return ResultResponseDTO.builder().message("JWT Token Generated!").data(jwt).build();
             }
         }
-        return ResultResponseDTO.builder().message("JWT Token Generation Failed!!!").response(null).build();
+        return ResultResponseDTO.builder().message("JWT Token Generation Failed!!!").data(null).build();
     }
 
 
